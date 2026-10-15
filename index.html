@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffe8ef">
+  <meta name="description" content="A tiny teddy-bear love app with sweet notes, your relationship day counter, and a surprise message.">
+  <title>Lovebug 💗</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #713d53;
+      --muted: #a87589;
+      --pink: #e982a4;
+      --deep-pink: #c85880;
+      --pale: #fff4f7;
+      --line: #f4c7d6;
+      --cream: #fffaf0;
+      --shadow: 0 12px 35px rgba(172, 83, 119, .13);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink);
+      font-family: ui-rounded, "Trebuchet MS", system-ui, -apple-system, sans-serif;
+      background: linear-gradient(150deg, #fff1f5 0%, #ffe1eb 48%, #fff4e9 100%);
+      padding: max(14px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .app { width: 100%; max-width: 480px; margin: 0 auto; }
+    .topline { display:flex; align-items:center; justify-content:space-between; padding: 8px 4px 14px; color: var(--deep-pink); font-size: .78rem; font-weight: 800; letter-spacing: .12em; }
+    .pill { background: rgba(255,255,255,.72); border:1px solid var(--line); padding:7px 11px; border-radius:999px; letter-spacing:0; font-size:.72rem; }
+    .hero, .card {
+      background: rgba(255,250,252,.94); border: 1.5px solid var(--line);
+      border-radius: 28px; box-shadow: var(--shadow);
+    }
+    .hero { text-align:center; padding: 25px 20px 22px; overflow:hidden; position:relative; }
+    .hero:before, .hero:after { content:"♡"; position:absolute; color:#f3b0c6; font-size:30px; opacity:.7; }
+    .hero:before { top:18px; left:20px; transform:rotate(-16deg); }
+    .hero:after { right:22px; top:30px; transform:rotate(15deg); }
+    .bear { font-size: 76px; line-height:1.15; filter: drop-shadow(0 5px 4px rgba(183,95,129,.12)); }
+    h1 { font-size: clamp(2rem, 8vw, 2.6rem); line-height:1.05; margin:12px 0 8px; color:var(--deep-pink); letter-spacing:-.04em; }
+    .subtitle { margin:0 auto; max-width:280px; color:var(--muted); font-size:.95rem; line-height:1.55; }
+    .name-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:17px; }
+    .name-chip { border-radius:999px; padding:8px 12px; background:#fff0f5; border:1px dashed #efb3c8; color:#b75d7d; font-size:.82rem; }
+    .section-title { font-size:1.05rem; margin:23px 4px 10px; font-weight:850; }
+    .card { padding:18px; margin-top:12px; }
+    .note-head { display:flex; align-items:center; gap:12px; }
+    .mini-bear { display:grid; place-items:center; width:48px; height:48px; flex:0 0 48px; border-radius:17px; background:#ffebf2; font-size:27px; }
+    .eyebrow { font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.11em; font-weight:800; }
+    h2 { font-size:1.15rem; margin:3px 0 0; }
+    .message { font-size:1rem; line-height:1.7; margin:16px 0 17px; }
+    .btn { border:0; border-radius:999px; padding:13px 17px; min-height:48px; font-weight:800; transition:transform .12s ease, filter .12s ease; }
+    .btn:active { transform:scale(.98); }
+    .btn-primary { background:var(--pink); color:white; box-shadow:0 4px 0 #cb6689; }
+    .btn-soft { background:#ffebf2; color:#ad4f73; border:1px solid #f3c2d3; }
+    .btn-full { width:100%; }
+    .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .counter { text-align:center; background:linear-gradient(145deg,#fff0f5,#fff8ef); }
+    .counter-icon { font-size:36px; }
+    .days { font-size:clamp(2.7rem, 13vw, 4rem); font-weight:900; color:var(--deep-pink); line-height:1.05; margin:8px 0; letter-spacing:-.05em; }
+    .counter-caption { color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .date-form { display:flex; gap:8px; margin-top:15px; }
+    input[type="date"] { width:100%; min-width:0; border:1px solid var(--line); border-radius:14px; padding:11px 10px; color:var(--ink); background:white; }
+    .surprise { text-align:center; background:var(--cream); border-color:#f0d9b9; }
+    .gift { font-size:44px; margin:2px 0 7px; }
+    .surprise-text { line-height:1.7; margin:12px 0 0; }
+    .hidden { display:none !important; }
+    .footer { text-align:center; padding:22px 8px 5px; color:#bd8198; font-size:.77rem; line-height:1.7; }
+    .sparkle { position:fixed; z-index:5; pointer-events:none; animation:float-up 1.7s ease-out forwards; font-size:23px; }
+    @keyframes float-up { from { opacity:0; transform:translateY(12px) scale(.7) rotate(0deg); } 15% {opacity:1;} to { opacity:0; transform:translateY(-130px) scale(1.25) rotate(25deg); } }
+    @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topline"><span>♡ LOVEBUG</span><span class="pill">a little love corner</span></div>
+
+    <section class="hero">
+      <div class="bear" aria-hidden="true">🧸💗</div>
+      <h1>Lovebug</h1>
+      <p class="subtitle">A tiny cozy corner for my favorite person. Made with hugs, hearts, and a little bit of magic.</p>
+      <div class="name-row">
+        <span class="name-chip">you + me ♡</span>
+        <span class="name-chip">my favorite human</span>
+      </div>
+    </section>
+
+    <h2 class="section-title">💌 A little note for you</h2>
+    <section class="card">
+      <div class="note-head">
+        <div class="mini-bear" aria-hidden="true">🐻</div>
+        <div><div class="eyebrow">open when you need a smile</div><h2 id="noteTitle">A reminder from my heart</h2></div>
+      </div>
+      <p class="message" id="loveNote" aria-live="polite">If I could choose a thousand times, I'd still choose you. On the easy days, on the messy days, and every ordinary day in between. 💗</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="nextNote">Another love note ♡</button>
+        <button class="btn btn-soft" id="copyNote">Copy note 💌</button>
+      </div>
+      <p id="copyStatus" class="eyebrow hidden" style="margin:12px 0 0;" aria-live="polite">Love note copied!</p>
+    </section>
+
+    <h2 class="section-title">🗓️ Our little timeline</h2>
+    <section class="card counter">
+      <div class="counter-icon" aria-hidden="true">🐻‍❄️💕</div>
+      <div class="eyebrow">days of us</div>
+      <div class="days" id="daysCount">♡</div>
+      <div class="counter-caption" id="counterCaption">Set your special date below to count the days together.</div>
+      <form class="date-form" id="dateForm">
+        <input type="date" id="startDate" aria-label="Relationship start date" required>
+        <button class="btn btn-primary" type="submit">Save date</button>
+      </form>
+      <p class="eyebrow" style="margin:12px 0 0;">Your date stays on this device.</p>
+    </section>
+
+    <h2 class="section-title">🎁 A tiny surprise</h2>
+    <section class="card surprise">
+      <div class="gift" aria-hidden="true">🎀</div>
+      <h2>There's something for you...</h2>
+      <p style="color:var(--muted);font-size:.9rem;line-height:1.5;">A small reminder, wrapped up in a bow. Tap when you're ready. ♡</p>
+      <button class="btn btn-primary btn-full" id="surpriseButton">Open your surprise 💝</button>
+      <div id="surpriseReveal" class="hidden">
+        <div class="gift" style="margin-top:17px;">💐</div>
+        <p class="surprise-text"><strong>Surprise, my love!</strong><br>If home were a person, it would be you. Thank you for being my comfort, my happiness, and my favorite hello. No matter what today brings, you don't have to face it alone. I'm cheering for you, always. 💗🧸</p>
+        <button class="btn btn-soft" id="moreHearts" style="margin-top:14px;">Send more hugs 🫶</button>
+      </div>
+    </section>
+
+    <footer class="footer">made with all my heart ♡<br>one little bear, a million hugs 🧸💗</footer>
+  </main>
+  <script>
+    const notes = [
+      { title: "A reminder from my heart", text: "If I could choose a thousand times, I'd still choose you. On the easy days, on the messy days, and every ordinary day in between. 💗" },
+      { title: "For your hard days", text: "You don't have to be strong every second. Rest when you need to, breathe, and remember that someone is always rooting for you. That's me, forever your cheerleader. 🧸" },
+      { title: "My favorite place", text: "My favorite place isn't a city or a house. It's wherever I get to laugh with you, hold your hand, and be myself beside you. 🫶" },
+      { title: "Tiny but true", text: "You make normal moments feel special. Even doing absolutely nothing with you feels like a little adventure. I love our little world. 🌷" },
+      { title: "A pocket hug", text: "Imagine me giving you the biggest, warmest bear hug right now. Squeeze tight! This hug comes with one kiss, extra cuddles, and unlimited love. 🤗💗" },
+      { title: "My favorite notification", text: "Your name on my screen still makes me smile. Out of all the messages in the world, yours will always be one of my favorites. 💌" },
+      { title: "Always on your team", text: "Whatever comes next, I hope you remember we're a team. I believe in you, I'm proud of you, and I'm grateful I get to do life with you. 💞" }
+    ];
+    let noteIndex = 0;
+    const noteEl = document.getElementById("loveNote");
+    const titleEl = document.getElementById("noteTitle");
+    document.getElementById("nextNote").addEventListener("click", () => {
+      noteIndex = (noteIndex + 1) % notes.length;
+      titleEl.textContent = notes[noteIndex].title;
+      noteEl.textContent = notes[noteIndex].text;
+      sprinkle("💗");
+    });
+    document.getElementById("copyNote").addEventListener("click", async () => {
+      const status = document.getElementById("copyStatus");
+      try {
+        await navigator.clipboard.writeText(noteEl.textContent);
+        status.textContent = "Love note copied! Paste it into a message 💌";
+      } catch {
+        status.textContent = "Tip: press and hold the note text to copy it 💌";
+      }
+      status.classList.remove("hidden");
+    });
+
+    const dateInput = document.getElementById("startDate");
+    const countEl = document.getElementById("daysCount");
+    const captionEl = document.getElementById("counterCaption");
+    const savedDate = localStorage.getItem("lovebug-start-date");
+    if (savedDate) { dateInput.value = savedDate; updateCounter(savedDate); }
+    function updateCounter(value) {
+      if (!value) return;
+      const start = new Date(value + "T00:00:00");
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      if (Number.isNaN(start.getTime()) || start > today) {
+        countEl.textContent = "♡";
+        captionEl.textContent = start > today ? "Your special date is in the future—your countdown is waiting! 💗" : "Choose a valid date to begin.";
+        return;
+      }
+      const days = Math.floor((today - start) / 86400000) + 1;
+      countEl.textContent = days.toLocaleString();
+      captionEl.textContent = days === 1 ? "Day 1 of your little love story. Here's to many more! ♡" : `days together since ${start.toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"})} ♡`;
+    }
+    document.getElementById("dateForm").addEventListener("submit", e => {
+      e.preventDefault();
+      if (!dateInput.value) return;
+      localStorage.setItem("lovebug-start-date", dateInput.value);
+      updateCounter(dateInput.value);
+      sprinkle("💕");
+    });
+
+    document.getElementById("surpriseButton").addEventListener("click", () => {
+      document.getElementById("surpriseReveal").classList.remove("hidden");
+      document.getElementById("surpriseButton").textContent = "Your surprise is open 💗";
+      sprinkle("💖");
+    });
+    document.getElementById("moreHearts").addEventListener("click", () => {
+      for (let i=0;i<7;i++) setTimeout(() => sprinkle(["💗","💕","🧸","💖"][i%4]), i*120);
+    });
+    function sprinkle(symbol) {
+      for (let i=0;i<5;i++) {
+        const el = document.createElement("span");
+        el.className = "sparkle";
+        el.textContent = symbol;
+        el.style.left = (20 + Math.random()*60) + "vw";
+        el.style.bottom = (18 + Math.random()*12) + "vh";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1800);
+      }
+    }
+
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>

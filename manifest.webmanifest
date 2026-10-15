@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Lovebug 💗",
+  "short_name": "Lovebug",
+  "description": "A tiny teddy-bear love corner with love notes, a relationship day counter, and a surprise message.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff1f5",
+  "theme_color": "#ffe8ef",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
